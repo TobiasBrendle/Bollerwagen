@@ -37,7 +37,7 @@ if __name__ == '__main__':
  #       t3=threading.Thread(target=ultrasonic, args=(GPIO_TRIGGER3, GPIO_ECHO3, 3))
   #      t4=threading.Thread(target=ultrasonic, args=(GPIO_TRIGGER4, GPIO_ECHO4, 4))
    #     t5=threading.Thread(target=ultrasonic, args=(GPIO_TRIGGER5, GPIO_ECHO5, 5))
-        t6=threading.Thread(target=cam, args=(GPIO_SERVO,werte))
+        t6=threading.Thread(target=cam, args=(GPIO_SERVO, werte))
         t7=threading.Thread(target=gui, args=(werte,))
     #    t8=threading.Thread(target=servo, args=(GPIO_SERVO,werte))
         t0.start()
