@@ -1,4 +1,5 @@
 import time
+from Values import Values
 
 from servo import *
 
@@ -35,7 +36,7 @@ def cam(gpio, werte):
             werte.cam = [x, werte.cam[0], time.time(), werte.cam[2]]    #hier wird die Abweichung von x zur Mitte übergeben, zusätzlich die Zeit zum Bilden des Differentials, die 2 letzen Werte werden auch behalten
             servo_control(werte)
 
-            werte.print_values()
+            #werte.print_values()
 
         cv2.imshow("Image", image)
         cv2.waitKey(1)
@@ -66,3 +67,8 @@ def show_marker(corners, image):
                 (topLeft[0], topLeft[1] - 15), cv2.FONT_HERSHEY_SIMPLEX,
                 0.5, (255, 0, 0), 2)
     return image
+
+
+if __name__ == "__main__":
+    w = Values()
+    cam(21, w)

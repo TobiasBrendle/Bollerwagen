@@ -21,8 +21,11 @@ def servo_control(werte):
     P = - x_pos * k_p   #P Anteil der Steuerung
 
     d = werte.cam
-    dx_dt = d[0] - d[1] / (d[2] - d[3])
-    D = dx_dt*k_d       #D Anteil der Steuerung
+    dx = d[0] - d[1]
+    dt = d[2] - d[3]
+
+    print(dt)
+    D = k_d*dx/dt       #D Anteil der Steuerung
 
     PD = P + D
     werte.servopos += PD

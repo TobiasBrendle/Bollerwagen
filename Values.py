@@ -14,4 +14,4 @@ class Values:
         self.uso[pos] = value
 
     def print_values(self):
-        print(self.uso, self.tof, self.cam,  self.servopos)
+        print(self.uso, self.tof)
