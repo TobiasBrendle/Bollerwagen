@@ -1,33 +1,33 @@
 import RPi.GPIO as GPIO
 import time
+import pigpio
 
 
-def servo_start(GPIO_SERVO, werte):
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(GPIO_SERVO, GPIO.OUT)
-
-    p = GPIO.PWM(GPIO_SERVO, 50)
-    servo_pos = 7.5
-    p.start(servo_pos)
-    time.sleep(0.1)
-    werte.servo = p
+def servo_start(gpio, werte):
+    pi = pigpio.pi()
+    pi.set_PWM_frequency(gpio, 400)
+    werte.servo = pi
 
 
-def servo_control(werte):
-    k_p = 0.0005
-    k_d = 0.00003
+def servo_control(gpio, werte):
+    k_p = 0.004
+    k_i = 0.00008
+    k_d = 0.005
 
     x_pos = werte.cam[0]
-    P = - x_pos * k_p   #P Anteil der Steuerung
+    P = - x_pos * k_p  # P Anteil der Steuerung
 
     d = werte.cam
     dx = d[0] - d[1]
     dt = d[2] - d[3]
+    D = k_d * dx / dt  # D Anteil der Steuerung
 
-    print(dt)
-    D = k_d*dx/dt       #D Anteil der Steuerung
+    I = - k_i * werte.cam[4]
 
-    PD = P + D
-    werte.servopos += PD
+    PID = P + I + D
+    werte.servopos += PID
 
-    werte.servo.ChangeDutyCycle(werte.servopos)
+    werte.servo.set_PWM_dutycycle(gpio, werte.servopos)
+
+
+
