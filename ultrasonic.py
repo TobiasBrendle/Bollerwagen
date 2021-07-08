@@ -33,5 +33,5 @@ def ultrasonic(GPIO_TRIGGER, GPIO_ECHO, sensornr, werte):
 
         #print('Abstand ', sensornr,' = ', distance, "\n")
         d = round(distance,2)
-        werte.refresh_uso(sensornr-1,d) 
-        
+        werte.refresh_uso(sensornr-1,d)
+

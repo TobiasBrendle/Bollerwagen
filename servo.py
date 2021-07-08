@@ -11,8 +11,8 @@ def servo_start(gpio, werte):
 
 def servo_control(gpio, werte):
     k_p = 0.004
-    k_i = 0.00008
-    k_d = 0.005
+    k_i = 0.000001
+    k_d = 0.001
 
     x_pos = werte.cam[0]
     P = - x_pos * k_p  # P Anteil der Steuerung
@@ -20,7 +20,7 @@ def servo_control(gpio, werte):
     d = werte.cam
     dx = d[0] - d[1]
     dt = d[2] - d[3]
-    D = k_d * dx / dt  # D Anteil der Steuerung
+    D = - k_d * dx / dt  # D Anteil der Steuerung
 
     I = - k_i * werte.cam[4]
 
@@ -28,6 +28,4 @@ def servo_control(gpio, werte):
     werte.servopos += PID
 
     werte.servo.set_PWM_dutycycle(gpio, werte.servopos)
-
-
 

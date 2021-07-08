@@ -28,18 +28,17 @@ def cam(gpio, werte):
             # loop over the detected ArUCo corners
             for (markerCorner, markerID) in zip(corners, ids):
                 corners = markerCorner.reshape((4, 2))
-            #    image = show_marker(corners, image)
+              #  image = show_marker(corners, image)
             x = (corners[0, 0] + corners[2, 0]) / 2
             x = x - 320
+            t = time.time()
 
             integral = werte.cam[4] + x
-            werte.cam = [x, werte.cam[0], time.time(), werte.cam[2], integral]    #hier wird die Abweichung von x zur Mitte übergeben, zusätzlich die Zeit zum Bilden des Differentials, die 2 letzen Werte werden auch behalten
+            werte.cam = [x, werte.cam[0], t, werte.cam[2], integral]    #hier wird die Abweichung von x zur Mitte übergeben, zusätzlich die Zeit zum Bilden des Differentials, die 2 letzen Werte werden auch behalten
             servo_control(gpio, werte)
 
-            werte.print_values()
-
       #  cv2.imshow("Image", image)
-     #   cv2.waitKey(1)
+        #cv2.waitKey(1)
 
 
 def show_marker(corners, image):

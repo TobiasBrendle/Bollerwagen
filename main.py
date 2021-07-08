@@ -2,10 +2,10 @@ import threading
 from cam import *
 from tof import *
 from ultrasonic import *
-from gui import *
 from servo import *
 from servo_run import *
 from Values import Values
+from gui import *
 
 # GPIO Mode (BOARD / BCM)
 GPIO.setmode(GPIO.BCM)
@@ -40,7 +40,7 @@ if __name__ == '__main__':
   #      t4=threading.Thread(target=ultrasonic, args=(GPIO_TRIGGER4, GPIO_ECHO4, 4))
    #     t5=threading.Thread(target=ultrasonic, args=(GPIO_TRIGGER5, GPIO_ECHO5, 5))
         t6=threading.Thread(target=cam, args=(GPIO_SERVO, werte))
-        t7=threading.Thread(target=gui, args=(werte,))
+      #  t7=threading.Thread(target=gui, args=(werte,))
       #  t8=threading.Thread(target=servo_run, args=(GPIO_SERVO, werte))
         t0.start()
         t1.start()
@@ -48,8 +48,8 @@ if __name__ == '__main__':
  #       t3.start()
   #      t4.start()
    #     t5.start()
-        t6.start()        
-        t7.start()
+        t6.start()
+      #  t7.start()
     #    t8.start()
         #t0.join()
         #t1.join()
@@ -58,6 +58,7 @@ if __name__ == '__main__':
   #      t4.join()
    #     t5.join()
         #t6.join()
+        g = Gui(werte)
 
     except KeyboardInterrupt:
         print("Measurement stopped by User")
