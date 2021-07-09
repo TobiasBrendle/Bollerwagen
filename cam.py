@@ -1,71 +1,75 @@
 import time
 from Values import Values
-
 from servo import *
-
-from picamera import PiCamera
-from picamera.array import PiRGBArray
 import cv2
 import numpy as np
-import imutils
 
 
-def cam(gpio, werte):
+def cam(gpio_servo, werte):
     cap = cv2.VideoCapture(0)
     arucoDict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
     arucoParams = cv2.aruco.DetectorParameters_create()
 
-    servo_start(gpio, werte)
+    servo_start(gpio_servo, werte)
 
     while True:
-        marker_detected = False
+        # Bild aufnehmen
         ret, image = cap.read()
+
+        # Marker Detektion durchführen
         (corners, ids, rejected) = cv2.aruco.detectMarkers(image, arucoDict, parameters=arucoParams)
+
         if len(corners) > 0:
-            marker_detected = True
-            # flatten the ArUco IDs list
             ids = ids.flatten()
-            # loop over the detected ArUCo corners
+
             for (markerCorner, markerID) in zip(corners, ids):
-                corners = markerCorner.reshape((4, 2))
-              #  image = show_marker(corners, image)
-            x = (corners[0, 0] + corners[2, 0]) / 2
-            x = x - 320
-            t = time.time()
+                if markerID == 0:
+                    werte.marker_detected = True
+                    corners = markerCorner.reshape((4, 2))
+                    (topLeft, topRight, bottomRight, bottomLeft) = corners
 
-            integral = werte.cam[4] + x
-            werte.cam = [x, werte.cam[0], t, werte.cam[2], integral]    #hier wird die Abweichung von x zur Mitte übergeben, zusätzlich die Zeit zum Bilden des Differentials, die 2 letzen Werte werden auch behalten
-            servo_control(gpio, werte)
+                    x = int((topLeft[0] + bottomRight[0]) / 2.0)
+                    y = int((topLeft[1] + bottomRight[1]) / 2.0)
 
-      #  cv2.imshow("Image", image)
-        #cv2.waitKey(1)
+                    w = int(np.sqrt((topRight[0] - topLeft[0]) ** 2 + (topRight[1] - topLeft[1]) ** 2))
+                    h = int(np.sqrt((bottomLeft[0] - topLeft[0]) ** 2 + (bottomLeft[1] - topLeft[1]) ** 2))
+
+                    werte.cam_pos = [x, y, w, h]
+
+                    # Berechnung von Parametern für PID-Steuerung
+                    x = x - 320
+                    t = time.time()
+
+                    integral = werte.cam[4] + x
+
+                    # [x_1, x_0, t_1, t_0, sum(x)]
+                    werte.cam = [x, werte.cam[0], t, werte.cam[2], integral]
+
+                    # Servo ausrichten
+                    servo_control(gpio_servo, werte)
+
+        else:
+            werte.marker_detected = False
+
+            # wenn gewünscht Servo rotieren, bis Marker gefunden
+            if werte.search_for_marker:
+                if time.time() - werte.cam[2] > 5:
+                    servo_search(gpio_servo, werte)
+
+        # wenn gewünscht Marker anzeigen
+        if werte.showMarker:
+            show_marker(image, werte)
 
 
-def show_marker(corners, image):
-    (topLeft, topRight, bottomRight, bottomLeft) = corners
-    topRight = (int(topRight[0]), int(topRight[1]))
-    bottomRight = (int(bottomRight[0]), int(bottomRight[1]))
-    bottomLeft = (int(bottomLeft[0]), int(bottomLeft[1]))
-    bottomLeft = (int(bottomLeft[0]), int(bottomLeft[1]))
-    topLeft = (int(topLeft[0]), int(topLeft[1]))
-
-    cv2.line(image, topLeft, topRight, (0, 255, 0), 10)
-    cv2.line(image, topRight, bottomRight, (0, 255, 0), 10)
-    cv2.line(image, bottomRight, bottomLeft, (0, 255, 0), 10)
-    cv2.line(image, bottomLeft, topLeft, (0, 255, 0), 10)
-
-    cX = int((topLeft[0] + bottomRight[0]) / 2.0)
-    cY = int((topLeft[1] + bottomRight[1]) / 2.0)
-
-    w = bottomRight[0] - bottomLeft[0]
-    h = topLeft[1] - bottomLeft[1]
-
-    cv2.circle(image, (cX, cY), 4, (0, 0, 255), -1)
-
-    cv2.putText(image, str(cX) + " , " + str(cY),
-                (topLeft[0], topLeft[1] - 15), cv2.FONT_HERSHEY_SIMPLEX,
-                0.5, (255, 0, 0), 2)
-    return image
+def show_marker(image, werte):
+    if werte.marker_detected:
+        x, y = werte.cam_pos[:2]
+        cv2.circle(image, (x, y), 4, (0, 255, 255), -1)
+        cv2.putText(image, "Abstand Mitte: " + str(x - 320), (x, y + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255),
+                    2)
+    werte.image = image
+    cv2.imshow("Image", image)
+    cv2.waitKey(1)
 
 
 if __name__ == "__main__":

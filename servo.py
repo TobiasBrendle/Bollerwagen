@@ -4,9 +4,21 @@ import pigpio
 
 
 def servo_start(gpio, werte):
-    pi = pigpio.pi()
-    pi.set_PWM_frequency(gpio, 400)
-    werte.servo = pi
+    werte.servo.set_PWM_frequency(gpio, 400)
+    werte.servo.set_PWM_dutycycle(gpio, 127)
+
+
+def servo_search(gpio, werte):
+    if werte.servo_search_clockwise:
+        werte.servopos +=2
+        werte.servo.set_PWM_dutycycle(gpio, werte.servopos)
+        if werte.servopos >= 167:
+            werte.servo_search_clockwise = False
+    else:
+        werte.servopos -=2
+        werte.servo.set_PWM_dutycycle(gpio, werte.servopos)
+        if werte.servopos <= 87:
+            werte.servo_search_clockwise = True
 
 
 def servo_control(gpio, werte):

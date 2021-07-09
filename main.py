@@ -3,7 +3,7 @@ from cam import *
 from tof import *
 from ultrasonic import *
 from servo import *
-from servo_run import *
+from servo_test import *
 from Values import Values
 from gui import *
 
@@ -25,9 +25,6 @@ GPIO_ECHO2 = 22
 
 GPIO_SERVO = 21
 
-
-#dip = np.zeros([1, 10])
-#que = queue.Queue()
 
 if __name__ == '__main__':
     werte = Values()

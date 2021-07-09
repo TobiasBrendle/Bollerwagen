@@ -42,7 +42,6 @@ class Gui():
         self.update()
         self.window.mainloop()
 
-
     def testing(self):
         print('auf -- umgestellt')
 
@@ -50,10 +49,22 @@ class Gui():
         c.create_oval(x - r, y - r, x + r, y + r, fill=f)
 
     def update(self):
-        self.werte.print_values()
+        steer, speed, value, msg = self.werte.get_values()      #Funktion gibt Wichtige Werte zum Anzeigen zurück
+        #steer zwischen -50 und 50, speed zwischen 0 und 100, value gibt an ob TOF ausgerichtet ist, msg gibt Fehlertext an
+        print("Lenkung = " + str(steer) + ", Geschwindigkeit = " + str(speed))
+
         for i in range(5):
             x = 100 + i * 115
             self.kreis(x, 420, 10, self.werte.get_uso_color(i), self.canvas)
-        self.canvas.after(500, self.update)
 
 
+        self.error_label = Label(self.window, text=msg)
+        self.error_label.place(x=800, y=200)
+
+        if value:
+            self.kreis(800, 420, 100, "green", self.canvas)
+
+        else:
+            self.kreis(800, 420, 100, "red", self.canvas)
+
+        self.canvas.after(50, self.update)
