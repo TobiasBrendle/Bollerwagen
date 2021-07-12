@@ -1,8 +1,8 @@
-import time
 from Values import Values
 from servo import *
 import cv2
 import numpy as np
+import time
 
 
 def cam(gpio_servo, werte):
@@ -12,7 +12,7 @@ def cam(gpio_servo, werte):
 
     servo_start(gpio_servo, werte)
 
-    while True:
+    while not werte.stop:
         # Bild aufnehmen
         ret, image = cap.read()
 
@@ -45,8 +45,9 @@ def cam(gpio_servo, werte):
                     # [x_1, x_0, t_1, t_0, sum(x)]
                     werte.cam = [x, werte.cam[0], t, werte.cam[2], integral]
 
-                    # Servo ausrichten
+                    # Servo
                     servo_control(gpio_servo, werte)
+
 
         else:
             werte.marker_detected = False
@@ -67,11 +68,10 @@ def show_marker(image, werte):
         cv2.circle(image, (x, y), 4, (0, 255, 255), -1)
         cv2.putText(image, "Abstand Mitte: " + str(x - 320), (x, y + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255),
                     2)
-    werte.image = image
-    cv2.imshow("Image", image)
-    cv2.waitKey(1)
 
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGBA)
+    werte.image = image
 
 if __name__ == "__main__":
     w = Values()
-    cam(21, w)
+    cam(12, w)

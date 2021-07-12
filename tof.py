@@ -1,11 +1,10 @@
 import serial
 import time
-import numpy as np
 
 
 def tof(werte):
     ser = serial.Serial("/dev/ttyAMA0", 115200, timeout=1)
-    while True:
+    while not werte.stop:
         time.sleep(0.1)
         count = ser.in_waiting
         if count > 8:

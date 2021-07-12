@@ -1,9 +1,8 @@
-import RPi.GPIO as GPIO
-import time
 import pigpio
 
 
 def servo_start(gpio, werte):
+    werte.servo = pigpio.pi()
     werte.servo.set_PWM_frequency(gpio, 400)
     werte.servo.set_PWM_dutycycle(gpio, 127)
 
@@ -22,9 +21,9 @@ def servo_search(gpio, werte):
 
 
 def servo_control(gpio, werte):
-    k_p = 0.004
-    k_i = 0.000001
-    k_d = 0.001
+    k_p = 0.0045
+    k_i = 0.00001
+    k_d = 0.002
 
     x_pos = werte.cam[0]
     P = - x_pos * k_p  # P Anteil der Steuerung
